@@ -417,7 +417,7 @@ function printRow(
     }
     doc.applyStyles(cell.styles)
 
-    if (isRtl) cursor.x -= column.width
+    if (isRtl) cursor.x -= cell.width
 
     cell.x = cursor.x
     cell.y = cursor.y
