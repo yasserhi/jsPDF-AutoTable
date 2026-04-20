@@ -1878,7 +1878,7 @@ function printRow(doc, table, row, cursor, columns) {
         }
         doc.applyStyles(cell.styles);
         if (isRtl)
-            cursor.x -= column.width;
+            cursor.x -= cell.width;
         cell.x = cursor.x;
         cell.y = cursor.y;
         var result = table.callCellHooks(doc, table.hooks.willDrawCell, cell, row, column, cursor);
