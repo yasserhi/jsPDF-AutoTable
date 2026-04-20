@@ -13,6 +13,7 @@ export default function (
 ) {
   styles = styles || {}
   const PHYSICAL_LINE_HEIGHT = 1.15
+  const isRtl = Boolean(styles.rtl)
 
   const k = doc.internal.scaleFactor
   const fontSize = doc.internal.getFontSize() / k
@@ -50,19 +51,22 @@ export default function (
           splitText[iLine],
           x - doc.getStringUnitWidth(splitText[iLine]) * alignSize,
           y,
+          isRtl ? { isInputRtl: false, isOutputRtl: true } : {},
         )
         y += lineHeight
       }
       return doc
     }
-    x -= doc.getStringUnitWidth(text) * alignSize
+    x -= doc.getStringUnitWidth(text as any) * alignSize
   }
 
+  const options: any = isRtl ? { isInputRtl: false, isOutputRtl: true } : {}
   if (styles.halign === 'justify') {
-    doc.text(text, x, y, { maxWidth: styles.maxWidth || 100, align: 'justify' })
-  } else {
-    doc.text(text, x, y)
+    options.maxWidth = styles.maxWidth || 100
+    options.align = 'justify'
   }
+
+  doc.text(text, x, y, options)
 
   return doc
 }
@@ -71,4 +75,5 @@ export interface TextStyles {
   valign?: 'middle' | 'bottom' | 'top'
   halign?: 'justify' | 'center' | 'right' | 'left'
   maxWidth?: number
+  rtl?: boolean
 }

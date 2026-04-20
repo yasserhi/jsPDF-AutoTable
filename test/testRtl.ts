@@ -45,4 +45,27 @@ describe('rtl', () => {
       }
     })
   })
+
+  it('rtl explicit cell override', () => {
+    const doc = new jsPDF()
+    autoTable(doc, {
+      body: [[{ content: 'أحمد', styles: { rtl: true } }]],
+      rtl: false, // Table-wide RTL is off
+      didDrawCell: (data) => {
+        assert.equal(data.cell.styles.rtl, true, 'Cell should have explicit RTL style')
+      },
+    })
+  })
+
+  it('mixed rtl/ltr automatic detection', () => {
+    const doc = new jsPDF()
+    autoTable(doc, {
+      body: [['English أحمد']],
+      didDrawCell: (data) => {
+        // This is harder to verify without intercepting doc.text calls,
+        // but we can at least ensure the code doesn't crash and the style is parsed.
+        assert.equal(typeof data.cell.text[0], 'string')
+      },
+    })
+  })
 })

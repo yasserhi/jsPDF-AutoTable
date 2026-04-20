@@ -36,6 +36,7 @@ export interface Styles {
   cellWidth: CellWidthType
   minCellHeight: number
   minCellWidth: number
+  rtl?: boolean
 }
 
 export type ThemeType = 'striped' | 'grid' | 'plain' | null
