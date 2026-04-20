@@ -771,6 +771,42 @@ examples.rtl = function () {
   return doc
 }
 
+// RTL Spans - shows how RTL works with rowspans and colspans
+examples['rtl-spans'] = function () {
+  const doc = new jsPDF()
+
+  doc.text('Right-to-left support with spans', 14, 20)
+
+  doc.autoTable({
+    head: [
+      [
+        {
+          content: 'معلومات المستخدم',
+          colSpan: 3,
+          styles: { halign: 'center', fillColor: [22, 160, 133] },
+        },
+      ],
+      ['المعرف', 'الاسم', 'البلد'],
+    ],
+    body: [
+      [
+        { content: '1', rowSpan: 2, styles: { valign: 'middle' } },
+        'أحمد',
+        'مصر',
+      ],
+      ['محمود', 'السعودية'],
+      ['2', { content: 'ليلى', colSpan: 2, styles: { halign: 'center' } }],
+    ],
+    startY: 25,
+    rtl: true,
+    theme: 'grid',
+    styles: { font: 'NotoNaskhArabic', fontStyle: 'normal' },
+  })
+
+  return doc
+}
+
+
 /*
  |--------------------------------------------------------------------------
  | Below is some helper functions for the examples
