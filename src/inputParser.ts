@@ -146,6 +146,7 @@ function parseSettings(doc: DocHandler, options: UserOptions): Settings {
     horizontalPageBreakRepeat,
     horizontalPageBreakBehaviour:
       options.horizontalPageBreakBehaviour ?? 'afterAllRows',
+    rtl: !!options.rtl,
   }
 }
 

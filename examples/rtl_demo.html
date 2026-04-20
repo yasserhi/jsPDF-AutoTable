@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jsPDF-AutoTable RTL Example</title>
+    <script src="dist/jspdf.plugin.autotable.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="examples/assets/notoNaskhArabic-regular.js"></script> <!-- Example font with Arabic support if available, or just use standard -->
+</head>
+<body>
+    <h1>jsPDF-AutoTable RTL Support</h1>
+    <button onclick="generateRtlPdf()">Generate RTL PDF</button>
+
+    <script>
+        function generateRtlPdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Set some Arabic/Persian text
+            // Note: For real Arabic support, a font with Arabic glyphs must be added
+            // and doc.addFont(...) called. Here we just show the layout logic.
+            
+            doc.text("RTL Table Example", 10, 10);
+
+            doc.autoTable({
+                head: [['نام', 'فامیلی', 'شناسه']],
+                body: [
+                    ['علی', 'احمدی', '1'],
+                    ['رضا', 'محمدی', '2'],
+                    ['سارا', 'کریمی', '3'],
+                ],
+                rtl: true,
+                startY: 20,
+                styles: { font: 'NotoNaskhArabic' } // Helvetica doesn't support Arabic, but layout will be RTL
+            });
+
+            doc.save('rtl-table.pdf');
+        }
+    </script>
+</body>
+</html>

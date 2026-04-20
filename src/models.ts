@@ -39,6 +39,7 @@ export interface Settings {
   horizontalPageBreak?: boolean
   horizontalPageBreakBehaviour?: 'immediately' | 'afterAllRows'
   horizontalPageBreakRepeat?: string | number | string[] | number[] | null
+  rtl: boolean
 }
 
 export type StyleProp =

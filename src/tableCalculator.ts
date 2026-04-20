@@ -42,11 +42,12 @@ function parseContent(input: TableInput, sf: number) {
 
   const theme = input.settings.theme
   const styles = input.styles
+  const rtl = input.settings.rtl
   return {
     columns,
-    head: parseSection('head', content.head, columns, styles, theme, sf),
-    body: parseSection('body', content.body, columns, styles, theme, sf),
-    foot: parseSection('foot', content.foot, columns, styles, theme, sf),
+    head: parseSection('head', content.head, columns, styles, theme, sf, rtl),
+    body: parseSection('body', content.body, columns, styles, theme, sf, rtl),
+    foot: parseSection('foot', content.foot, columns, styles, theme, sf, rtl),
   }
 }
 
@@ -57,6 +58,7 @@ function parseSection(
   styleProps: StylesProps,
   theme: ThemeName,
   scaleFactor: number,
+  rtl: boolean,
 ): Row[] {
   const rowSpansLeftForColumn: {
     [key: string]: { left: number; times: number }
@@ -93,6 +95,7 @@ function parseSection(
             styleProps,
             scaleFactor,
             cellInputStyles,
+            rtl,
           )
           const cell = new Cell(rawCell, styles, sectionName)
           // dataKey is not used internally no more but keep for
@@ -167,6 +170,7 @@ function cellStyles(
   styles: StylesProps,
   scaleFactor: number,
   cellInputStyles: Partial<Styles>,
+  rtl: boolean,
 ) {
   const theme = getTheme(themeName)
   let sectionStyles
@@ -194,6 +198,9 @@ function cellStyles(
       ? assign({}, theme.alternateRow, styles.alternateRowStyles)
       : {}
   const defaultStyle = defaultStyles(scaleFactor)
+  if (rtl) {
+    defaultStyle.halign = 'right'
+  }
   const themeStyles = assign(
     {},
     defaultStyle,

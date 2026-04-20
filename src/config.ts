@@ -69,6 +69,7 @@ export interface UserOptions {
   // Column data key to repeat if horizontalPageBreak = true
   horizontalPageBreakRepeat?: string[] | number[] | string | number
   horizontalPageBreakBehaviour?: HorizontalPageBreakBehaviourType
+  rtl?: boolean
 
   // Styles
   styles?: Partial<Styles>

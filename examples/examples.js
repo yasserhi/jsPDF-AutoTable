@@ -746,6 +746,31 @@ examples.horizontalPageBreakBehaviour = function () {
   return doc
 }
 
+// RTL - shows how tables can be drawn with Right-To-Left support
+examples.rtl = function () {
+  const doc = new jsPDF()
+
+  doc.text('Right-to-left support (Arabic)', 14, 20)
+
+  // Note: For real Arabic support (ligatures/shaping), you must:
+  // 1. Add an Arabic font (like Amiri) as a base64 string
+  // 2. Use a library like 'arabic-reshaper' if needed
+
+  doc.autoTable({
+    head: [['المعرف', 'الاسم', 'البريد الإلكتروني', 'البلد', 'المدينة']],
+    body: [
+      ['1', 'أحمد', 'ahmed@example.com', 'مصر', 'القاهرة'],
+      ['2ب1', 'محمود', 'mahmoud@example.com', 'السعودية', 'الرياض'],
+      ['3', 'ليلى', 'layla@example.com', 'الإمارات', 'دبي'],
+    ],
+    startY: 25,
+    rtl: true,
+    styles: { font: 'NotoNaskhArabic', fontStyle: 'normal' }, // Standard fonts don't support Arabic glyphs, but layout will be RTL
+  })
+
+  return doc
+}
+
 /*
  |--------------------------------------------------------------------------
  | Below is some helper functions for the examples

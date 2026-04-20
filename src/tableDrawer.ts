@@ -399,14 +399,25 @@ function printRow(
   cursor: Pos,
   columns: Column[],
 ) {
-  cursor.x = table.settings.margin.left
+  const tableWidth = table.getWidth(doc.pageSize().width)
+  const isRtl = table.settings.rtl
+
+  if (!isRtl) {
+    cursor.x = table.settings.margin.left
+  } else {
+    cursor.x = table.settings.margin.left + tableWidth
+  }
+
   for (const column of columns) {
     const cell = row.cells[column.index]
     if (!cell) {
-      cursor.x += column.width
+      if (isRtl) cursor.x -= column.width
+      else cursor.x += column.width
       continue
     }
     doc.applyStyles(cell.styles)
+
+    if (isRtl) cursor.x -= column.width
 
     cell.x = cursor.x
     cell.y = cursor.y
@@ -420,7 +431,7 @@ function printRow(
       cursor,
     )
     if (result === false) {
-      cursor.x += column.width
+      if (!isRtl) cursor.x += column.width
       continue
     }
 
@@ -443,7 +454,7 @@ function printRow(
 
     table.callCellHooks(doc, table.hooks.didDrawCell, cell, row, column, cursor)
 
-    cursor.x += column.width
+    if (!isRtl) cursor.x += column.width
   }
 
   cursor.y += row.height
