@@ -417,10 +417,9 @@ function printRow(
     }
     doc.applyStyles(cell.styles)
 
-    if (isRtl) cursor.x -= cell.width
-
     cell.x = cursor.x
     cell.y = cursor.y
+    if (isRtl) cell.x -= cell.width
 
     const result = table.callCellHooks(
       doc,
@@ -456,6 +455,7 @@ function printRow(
     table.callCellHooks(doc, table.hooks.didDrawCell, cell, row, column, cursor)
 
     if (!isRtl) cursor.x += column.width
+    else cursor.x -= column.width
   }
 
   cursor.y += row.height
