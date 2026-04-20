@@ -123,6 +123,7 @@ autoTable(doc, {
 - `cellPadding: Padding = 10`
 - `lineColor: Color = 10`
 - `lineWidth: border = 0` // If 0, no border is drawn
+- `rtl: boolean = false` // Overrides the table-level rtl setting for specific cells or columns
 
 `Color`:
 Either false for transparent, hex string, gray level 0-255 or rbg array e.g. [255, 0, 0]
@@ -188,6 +189,7 @@ autoTable(doc, {
 - `horizontalPageBreak: boolean = false` To split/break the table into multiple pages if the given table width exceeds the page width
 - `horizontalPageBreakRepeat: string|number|string[]|number[]` To repeat the given column in the split pages, works when `horizontalPageBreak = true`. The accepted values are column dataKeys, such as `'id'`, `recordId` or column indexes, such as `0`, `1` or array for multiple columns.
 - `horizontalPageBreakBehaviour: 'immediately'|'afterAllRows' = 'afterAllRows'` How the horizontal page breaks behave, works when `horizontalPageBreak = true`
+- `rtl: boolean = false` To enable Right-to-Left (RTL) text and layout support for languages like Arabic and Persian. When true, columns are drawn right-to-left and default text alignment is set to right. Ensure an appropriate Arabic-supporting font is used (via base64 and `doc.addFileToVFS`).
 
 `Margin`:
 Either a number or object `{top: number, right: number, bottom: number, left: number}`
