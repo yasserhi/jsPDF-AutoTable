@@ -125,6 +125,7 @@ exports["default"] = default_1;
 function default_1(text, x, y, styles, doc) {
     styles = styles || {};
     var PHYSICAL_LINE_HEIGHT = 1.15;
+    var isRtl = Boolean(styles.rtl);
     var k = doc.internal.scaleFactor;
     var fontSize = doc.internal.getFontSize() / k;
     var lineHeightFactor = doc.getLineHeightFactor
@@ -153,19 +154,19 @@ function default_1(text, x, y, styles, doc) {
             alignSize *= 0.5;
         if (splitText && lineCount >= 1) {
             for (var iLine = 0; iLine < splitText.length; iLine++) {
-                doc.text(splitText[iLine], x - doc.getStringUnitWidth(splitText[iLine]) * alignSize, y);
+                doc.text(splitText[iLine], x - doc.getStringUnitWidth(splitText[iLine]) * alignSize, y, isRtl ? { isInputRtl: false, isOutputRtl: true } : {});
                 y += lineHeight;
             }
             return doc;
         }
         x -= doc.getStringUnitWidth(text) * alignSize;
     }
+    var options = isRtl ? { isInputRtl: false, isOutputRtl: true } : {};
     if (styles.halign === 'justify') {
-        doc.text(text, x, y, { maxWidth: styles.maxWidth || 100, align: 'justify' });
+        options.maxWidth = styles.maxWidth || 100;
+        options.align = 'justify';
     }
-    else {
-        doc.text(text, x, y);
-    }
+    doc.text(text, x, y, options);
     return doc;
 }
 
@@ -665,6 +666,7 @@ function parseSettings(doc, options) {
         horizontalPageBreak: horizontalPageBreak,
         horizontalPageBreakRepeat: horizontalPageBreakRepeat,
         horizontalPageBreakBehaviour: (_m = options.horizontalPageBreakBehaviour) !== null && _m !== void 0 ? _m : 'afterAllRows',
+        rtl: !!options.rtl,
     };
 }
 function getStartY(doc, userStartY) {
@@ -777,14 +779,15 @@ function parseContent(input, sf) {
     }
     var theme = input.settings.theme;
     var styles = input.styles;
+    var rtl = input.settings.rtl;
     return {
         columns: columns,
-        head: parseSection('head', content.head, columns, styles, theme, sf),
-        body: parseSection('body', content.body, columns, styles, theme, sf),
-        foot: parseSection('foot', content.foot, columns, styles, theme, sf),
+        head: parseSection('head', content.head, columns, styles, theme, sf, rtl),
+        body: parseSection('body', content.body, columns, styles, theme, sf, rtl),
+        foot: parseSection('foot', content.foot, columns, styles, theme, sf, rtl),
     };
 }
-function parseSection(sectionName, sectionRows, columns, styleProps, theme, scaleFactor) {
+function parseSection(sectionName, sectionRows, columns, styleProps, theme, scaleFactor, rtl) {
     var rowSpansLeftForColumn = {};
     var result = sectionRows.map(function (rawRow, rowIndex) {
         var skippedRowForRowSpans = 0;
@@ -808,7 +811,7 @@ function parseSection(sectionName, sectionRows, columns, styleProps, theme, scal
                     if (typeof rawCell === 'object' && !Array.isArray(rawCell)) {
                         cellInputStyles = (rawCell === null || rawCell === void 0 ? void 0 : rawCell.styles) || {};
                     }
-                    var styles = cellStyles(sectionName, column, rowIndex, theme, styleProps, scaleFactor, cellInputStyles);
+                    var styles = cellStyles(sectionName, column, rowIndex, theme, styleProps, scaleFactor, cellInputStyles, rtl);
                     var cell = new models_1.Cell(rawCell, styles, sectionName);
                     // dataKey is not used internally no more but keep for
                     // backwards compat in hooks
@@ -873,7 +876,7 @@ function createColumns(columns) {
         return new models_1.Column(key, input, index);
     });
 }
-function cellStyles(sectionName, column, rowIndex, themeName, styles, scaleFactor, cellInputStyles) {
+function cellStyles(sectionName, column, rowIndex, themeName, styles, scaleFactor, cellInputStyles, rtl) {
     var theme = (0, config_1.getTheme)(themeName);
     var sectionStyles;
     if (sectionName === 'head') {
@@ -894,6 +897,9 @@ function cellStyles(sectionName, column, rowIndex, themeName, styles, scaleFacto
         ? (0, polyfills_1.assign)({}, theme.alternateRow, styles.alternateRowStyles)
         : {};
     var defaultStyle = (0, config_1.defaultStyles)(scaleFactor);
+    if (rtl) {
+        defaultStyle.halign = 'right';
+    }
     var themeStyles = (0, polyfills_1.assign)({}, defaultStyle, otherStyles, rowStyles, colStyles);
     return (0, polyfills_1.assign)(themeStyles, cellInputStyles);
 }
@@ -1988,20 +1994,34 @@ function printFullRow(doc, table, row, isLastRow, startPos, cursor, columns) {
     }
 }
 function printRow(doc, table, row, cursor, columns) {
-    cursor.x = table.settings.margin.left;
+    var _a;
+    var tableWidth = table.getWidth(doc.pageSize().width);
+    var isRtl = table.settings.rtl;
+    if (!isRtl) {
+        cursor.x = table.settings.margin.left;
+    }
+    else {
+        cursor.x = table.settings.margin.left + tableWidth;
+    }
     for (var _i = 0, columns_1 = columns; _i < columns_1.length; _i++) {
         var column = columns_1[_i];
         var cell = row.cells[column.index];
         if (!cell) {
-            cursor.x += column.width;
+            if (isRtl)
+                cursor.x -= column.width;
+            else
+                cursor.x += column.width;
             continue;
         }
         doc.applyStyles(cell.styles);
+        if (isRtl)
+            cursor.x -= column.width;
         cell.x = cursor.x;
         cell.y = cursor.y;
         var result = table.callCellHooks(doc, table.hooks.willDrawCell, cell, row, column, cursor);
         if (result === false) {
-            cursor.x += column.width;
+            if (!isRtl)
+                cursor.x += column.width;
             continue;
         }
         drawCellRect(doc, cell, cursor);
@@ -2010,9 +2030,11 @@ function printRow(doc, table, row, cursor, columns) {
             halign: cell.styles.halign,
             valign: cell.styles.valign,
             maxWidth: Math.ceil(cell.width - cell.padding('left') - cell.padding('right')),
+            rtl: (_a = cell.styles.rtl) !== null && _a !== void 0 ? _a : table.settings.rtl,
         }, doc.getDocument());
         table.callCellHooks(doc, table.hooks.didDrawCell, cell, row, column, cursor);
-        cursor.x += column.width;
+        if (!isRtl)
+            cursor.x += column.width;
     }
     cursor.y += row.height;
 }

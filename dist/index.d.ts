@@ -63,6 +63,7 @@ export interface Settings {
 	horizontalPageBreak?: boolean;
 	horizontalPageBreakBehaviour?: "immediately" | "afterAllRows";
 	horizontalPageBreakRepeat?: string | number | string[] | number[] | null;
+	rtl: boolean;
 }
 export interface StylesProps {
 	styles: Partial<Styles>;
@@ -190,6 +191,7 @@ export interface Styles {
 	cellWidth: CellWidthType;
 	minCellHeight: number;
 	minCellWidth: number;
+	rtl?: boolean;
 }
 export type ThemeType = "striped" | "grid" | "plain" | null;
 export type PageBreakType = "auto" | "avoid" | "always";
@@ -220,6 +222,7 @@ export interface UserOptions {
 	horizontalPageBreak?: boolean;
 	horizontalPageBreakRepeat?: string[] | number[] | string | number;
 	horizontalPageBreakBehaviour?: HorizontalPageBreakBehaviourType;
+	rtl?: boolean;
 	styles?: Partial<Styles>;
 	bodyStyles?: Partial<Styles>;
 	headStyles?: Partial<Styles>;
