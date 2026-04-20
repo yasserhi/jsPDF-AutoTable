@@ -2014,10 +2014,10 @@ function printRow(doc, table, row, cursor, columns) {
             continue;
         }
         doc.applyStyles(cell.styles);
-        if (isRtl)
-            cursor.x -= cell.width;
         cell.x = cursor.x;
         cell.y = cursor.y;
+        if (isRtl)
+            cell.x -= cell.width;
         var result = table.callCellHooks(doc, table.hooks.willDrawCell, cell, row, column, cursor);
         if (result === false) {
             if (!isRtl)
@@ -2035,6 +2035,8 @@ function printRow(doc, table, row, cursor, columns) {
         table.callCellHooks(doc, table.hooks.didDrawCell, cell, row, column, cursor);
         if (!isRtl)
             cursor.x += column.width;
+        else
+            cursor.x -= column.width;
     }
     cursor.y += row.height;
 }
